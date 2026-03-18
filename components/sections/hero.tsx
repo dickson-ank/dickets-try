@@ -1,7 +1,7 @@
+// components/Hero.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import {
   MdLocationOn,
   MdSearch,
@@ -34,11 +34,11 @@ const locations: Location[] = [
 ];
 
 const categories: Category[] = [
-  { id: "all", label: "All", icon: <MdApps size={15} /> },
-  { id: "concerts", label: "Concerts", icon: <MdMusicNote size={15} /> },
-  { id: "festivals", label: "Festivals", icon: <MdCelebration size={15} /> },
-  { id: "tech", label: "Tech", icon: <MdDevices size={15} /> },
-  { id: "business", label: "Business", icon: <MdBusiness size={15} /> },
+  { id: "all", label: "All", icon: <MdApps size={14} /> },
+  { id: "concerts", label: "Concerts", icon: <MdMusicNote size={14} /> },
+  { id: "festivals", label: "Festivals", icon: <MdCelebration size={14} /> },
+  { id: "tech", label: "Tech", icon: <MdDevices size={14} /> },
+  { id: "business", label: "Business", icon: <MdBusiness size={14} /> },
 ];
 
 type HeroProps = {
@@ -47,147 +47,237 @@ type HeroProps = {
 
 export default function Hero({ onSearch }: HeroProps) {
   const [query, setQuery] = useState("");
-  const [activeLocation, setActiveLocation] = useState<Location>(locations[0]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeLocation, setLocation] = useState<Location>(locations[0]);
+  const [dropdownOpen, setDropdown] = useState(false);
+  const [activeCategory, setCategory] = useState("all");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function onClickOutside(e: MouseEvent) {
+    function handler(e: MouseEvent) {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(e.target as Node)
       ) {
-        setDropdownOpen(false);
+        setDropdown(false);
       }
     }
-    document.addEventListener("mousedown", onClickOutside);
-    return () => document.removeEventListener("mousedown", onClickOutside);
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   return (
-    <section className="relative overflow-hidden section-padding animate-fade-in">
-      {/* Background image — next/image for optimization */}
-      <Image
-        src="/hero-bg.png"
-        alt=""
-        fill
-        priority
-        quality={90}
-        className="object-cover object-center opacity-45"
-        aria-hidden="true"
+    <section
+      className="relative overflow-hidden section-padding animate-fade-in"
+      style={{ background: "#080d1f" }}
+    >
+      {/* radial glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            radial-gradient(ellipse at 50% 0%, rgba(59,127,255,0.13) 0%, transparent 65%),
+            radial-gradient(ellipse at 15% 60%, rgba(59,127,255,0.08) 0%, transparent 50%),
+            radial-gradient(ellipse at 85% 30%, rgba(179,17,0,0.07) 0%, transparent 50%)
+          `,
+        }}
       />
 
-      {/* Subtle overlay so text stays readable over any image brightness */}
-      <div className="absolute inset-0 bg-background/40" />
+      {/* horizontal line texture */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: `repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 32px,
+            rgba(255,255,255,0.018) 32px,
+            rgba(255,255,255,0.018) 33px
+          )`,
+        }}
+      />
 
-      {/* Content — sits above image and overlay */}
-      <div className="relative z-10 container-lg flex flex-col items-center text-center gap-sp-8">
-        {/* Overline */}
-        <span className="text-overline text-secondary">
-          50,000+ Events Across Africa
-        </span>
+      {/* Content */}
+      <div className="relative z-10 container-lg flex flex-col items-center text-center gap-sp-7">
+        {/* Overline badge */}
+        <div
+          className="inline-cluster-sm rounded-full px-sp-4 py-sp-2 border animate-slide-up"
+          style={{
+            background: "rgba(59,127,255,0.12)",
+            borderColor: "rgba(59,127,255,0.22)",
+          }}
+        >
+          <span
+            className="w-2 h-2 rounded-full flex-shrink-0"
+            style={{ background: "#3b7fff" }}
+          />
+          <span
+            className="text-xs font-semibold tracking-widest uppercase"
+            style={{ color: "#3b7fff" }}
+          >
+            50,000+ events across Africa
+          </span>
+        </div>
 
-        {/* Headline */}
-        <h1 className="text-4xl font-bold tracking-tight">
-          <span className="text-foreground block">Africa&apos;s Rhythms,</span>
-          <span className="text-secondary block">One Ticket Away.</span>
+        {/* Headline — 3 lines, mixed weights */}
+        <h1 className="animate-slide-up" style={{ lineHeight: 1.05 }}>
+          <span
+            className="block text-4xl md:text-display font-light tracking-tight"
+            style={{ color: "rgba(255,255,255,0.65)" }}
+          >
+            Africa&apos;s
+          </span>
+          <span className="block text-4xl md:text-display font-bold tracking-tight text-white">
+            Rhythms,
+          </span>
+          <span
+            className="block text-4xl md:text-display font-bold tracking-tight"
+            style={{ color: "#ff4d3d" }}
+          >
+            One Ticket Away.
+          </span>
         </h1>
 
-        {/* Search bar */}
+        {/* Search bar — dark on dark */}
         <div className="w-full max-w-2xl animate-slide-up">
-          <div className="flex items-center gap-sp-2 bg-background rounded-full border border-border shadow-md px-sp-4 py-sp-5">
-            {/* Location selector */}
-            <div className="relative shrink-0" ref={dropdownRef}>
-              <button
-                onClick={() => setDropdownOpen((v) => !v)}
-                className="inline-cluster rounded-full bg-layer-01 border border-border px-sp-4 py-sp-2 text-sm font-medium text-foreground hover:bg-layer-03 transition-colors cursor-pointer"
-                aria-expanded={dropdownOpen}
-                aria-haspopup="listbox"
-              >
-                <MdLocationOn size={15} className="text-primary" />
-                <span>{activeLocation.code}</span>
-                <MdKeyboardArrowDown
-                  size={15}
-                  className={`text-muted-foreground transition-transform duration-150 ${
-                    dropdownOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {dropdownOpen && (
-                <div
-                  className="absolute top-full left-0 mt-sp-2 w-48 bg-background border border-border rounded-lg shadow-lg p-sp-1 z-dropdown animate-scale-in"
-                  role="listbox"
+          <div
+            className="flex flex-col md:flex-row items-stretch md:items-center gap-sp-1 md:gap-sp-2
+                       rounded-2xl border p-sp-2"
+            style={{
+              background: "#0e1535",
+              borderColor: "rgba(255,255,255,0.13)",
+              boxShadow:
+                "0 16px 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)",
+            }}
+          >
+            {/* Row: location + divider + input */}
+            <div className="flex items-center gap-sp-2 flex-1 min-w-0 px-sp-2">
+              {/* Location dropdown */}
+              <div className="relative flex-shrink-0" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdown((v) => !v)}
+                  className="inline-cluster-sm rounded-xl px-sp-3 py-sp-2 text-sm font-semibold
+                             border cursor-pointer transition-colors"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    borderColor: "rgba(255,255,255,0.07)",
+                    color: "rgba(255,255,255,0.7)",
+                  }}
+                  aria-expanded={dropdownOpen}
+                  aria-haspopup="listbox"
                 >
-                  {locations.map((loc) => (
-                    <button
-                      key={loc.code}
-                      role="option"
-                      aria-selected={activeLocation.code === loc.code}
-                      onClick={() => {
-                        setActiveLocation(loc);
-                        setDropdownOpen(false);
-                      }}
-                      className={`w-full flex items-center gap-sp-3 px-sp-4 py-sp-3 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                        activeLocation.code === loc.code
-                          ? "text-primary"
-                          : "text-foreground hover:bg-layer-01"
-                      }`}
-                    >
-                      <span className="text-base">{loc.flag}</span>
-                      <span className="flex-1 text-left">{loc.name}</span>
-                      {activeLocation.code === loc.code && (
-                        <MdCheck size={14} className="text-primary" />
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
+                  <MdLocationOn size={14} style={{ color: "#3b7fff" }} />
+                  <span>{activeLocation.name}</span>
+                  <MdKeyboardArrowDown
+                    size={14}
+                    className={`transition-transform duration-150 ${dropdownOpen ? "rotate-180" : ""}`}
+                    style={{ color: "rgba(255,255,255,0.35)" }}
+                  />
+                </button>
+
+                {/* Dropdown */}
+                {dropdownOpen && (
+                  <div
+                    className="absolute top-full left-0 mt-sp-2 w-52 rounded-xl border p-sp-1
+                               z-dropdown animate-scale-in"
+                    style={{
+                      background: "#0e1535",
+                      borderColor: "rgba(255,255,255,0.13)",
+                      boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
+                    }}
+                    role="listbox"
+                  >
+                    {locations.map((loc) => {
+                      const selected = activeLocation.code === loc.code;
+                      return (
+                        <button
+                          key={loc.code}
+                          role="option"
+                          aria-selected={selected}
+                          onClick={() => {
+                            setLocation(loc);
+                            setDropdown(false);
+                          }}
+                          className="w-full flex items-center gap-sp-3 px-sp-4 py-sp-3 rounded-lg
+                                     text-sm font-medium cursor-pointer transition-colors"
+                          style={{
+                            background: selected
+                              ? "rgba(59,127,255,0.15)"
+                              : "transparent",
+                            color: selected
+                              ? "#3b7fff"
+                              : "rgba(255,255,255,0.7)",
+                          }}
+                        >
+                          <span className="text-base">{loc.flag}</span>
+                          <span className="flex-1 text-left">{loc.name}</span>
+                          {selected && (
+                            <MdCheck size={14} style={{ color: "#3b7fff" }} />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Vertical divider */}
+              <div
+                className="w-px h-5 flex-shrink-0"
+                style={{ background: "rgba(255,255,255,0.13)" }}
+              />
+
+              {/* Input */}
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) =>
+                  e.key === "Enter" && onSearch?.(query, activeLocation)
+                }
+                placeholder="Where's the pulse?"
+                className="flex-1 bg-transparent outline-none text-sm font-sans min-w-0 text-white
+                           placeholder:text-white/40"
+              />
             </div>
 
-            {/* Divider */}
-            <div className="w-px h-6 bg-border shrink-0" />
-
-            {/* Search input */}
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) =>
-                e.key === "Enter" && onSearch?.(query, activeLocation)
-              }
-              placeholder="Search for events, artists, or venues"
-              className="flex-1 bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground font-sans min-w-0"
-            />
-
-            {/* Search button */}
+            {/* Search button — full width on mobile */}
             <button
               onClick={() => onSearch?.(query, activeLocation)}
-              className="gradient-primary btn-sm rounded-full shrink-0 inline-cluster-sm"
+              className="inline-cluster-sm justify-center rounded-xl px-sp-5 py-sp-3 text-sm
+                         font-semibold text-white border-none cursor-pointer transition-colors
+                         flex-shrink-0"
+              style={{ background: "#3b7fff" }}
             >
-              <MdSearch size={15} />
-              <span className="hidden sm:inline">Search</span>
+              <MdSearch size={16} />
+              <span>Search in {activeLocation.name}</span>
             </button>
           </div>
         </div>
 
         {/* Category pills */}
-        <div className="inline-cluster gap-sp-2">
-          {categories.map(({ id, label, icon }) => (
-            <button
-              key={id}
-              onClick={() => setActiveCategory(id)}
-              className={`inline-cluster-sm rounded-full px-sp-4 py-sp-2 text-sm font-medium border transition-colors cursor-pointer ${
-                activeCategory === id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-transparent text-muted-foreground border-border hover:bg-layer-01 hover:text-foreground"
-              }`}
-            >
-              {icon}
-              {label}
-            </button>
-          ))}
+        <div
+          className="inline-cluster gap-sp-2 overflow-x-auto w-full justify-center
+                        scrollbar-none pb-sp-1"
+        >
+          {categories.map(({ id, label, icon }) => {
+            const active = activeCategory === id;
+            return (
+              <button
+                key={id}
+                onClick={() => setCategory(id)}
+                className="inline-cluster-sm flex-shrink-0 rounded-full px-sp-4 py-sp-2
+                           text-sm font-medium border cursor-pointer transition-colors"
+                style={{
+                  background: active ? "rgba(59,127,255,0.15)" : "transparent",
+                  borderColor: active ? "#3b7fff" : "rgba(255,255,255,0.07)",
+                  color: active ? "#3b7fff" : "rgba(255,255,255,0.4)",
+                }}
+              >
+                {icon}
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
     </section>

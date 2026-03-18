@@ -1024,10 +1024,6 @@
 
     color: var(--primary-foreground);
   }
-  .gradient-hero {
-    background: linear-gradient(185deg, #9eb9e6 0%, #ffffff 100%);
-  }
-
   /* motion */
 
   .animate-fade-in {
